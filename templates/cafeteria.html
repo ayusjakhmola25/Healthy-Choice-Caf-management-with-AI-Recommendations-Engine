@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Cafe Zone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <aside class="side-nav">
+            <div class="brand">
+                <img src="/static/images/cafelogo.png.jpeg" alt="Cafe" class="brand-logo">
+                <div class="brand-text">
+                    <div class="brand-name">Hangout Cafe</div>
+                    <div class="brand-tag">Healthy Eating Hub</div>
+                </div>
+            </div>
+            <nav class="side-links">
+                <a href="/" class="side-link active"><span>🍽️</span><span>Menu</span></a>
+                <a href="/cart" class="side-link"><span>🛒</span><span>My Cart</span><span class="badge" id="cart-count">0</span></a>
+                <a href="/orders" class="side-link"><span>📦</span><span>My Orders</span></a>
+                <a href="/profile" class="side-link"><span>👤</span><span>Profile</span></a>
+            </nav>
+            <div class="side-footer">
+                <button class="logout-btn" onclick="logout()">↪ Logout</button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="page-header">
+                <h1 class="page-title">Our Menu</h1>
+                <div class="page-subtitle">Discover delicious Indian cuisine</div>
+            </header>
+        <!-- AI Recommendations Banner -->
+        <section class="ai-reco" id="aiReco">
+            <div class="ai-reco-header">
+                <span style="font-size:18px;">🧠 AI Recommendations for You</span>
+                <span class="ai-chip" id="aiRecoTag">Personalized</span>
+            </div>
+            <div class="ai-reco-body" id="aiRecoBody">
+                <div class="ai-reco-loading" id="aiRecoLoading">Analyzing your preferences...</div>
+                <div class="ai-reco-cards" id="aiRecoCards" style="display:none;"></div>
+            </div>
+        </section>
+
+        <div class="search-row">
+            <input type="text" placeholder="Search for dishes..." class="search-field">
+        </div>
+
+        <div class="filter-row">
+            <button class="filter-chip active" id="filterAll">All</button>
+            <button class="filter-chip" id="filterDiet">Diet</button>
+            <button class="filter-chip" id="filterNonDiet">Non-Diet</button>
+        </div>
+        <div class="category-filters-container">
+            <div class="category-item">
+                <img src="/static/images/pizza1.jpeg" alt="Pizza" class="category-image">
+                <p class="category-name">Pizza</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/burger1.jpeg" alt="Burger" class="category-image">
+                <p class="category-name">Burger</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/indian.jpeg" alt="Indian" class="category-image">
+                <p class="category-name">Indian</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/cake1.jpeg" alt="Dessert" class="category-image">
+                <p class="category-name">Dessert</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/healthy.jpeg" alt="Healthy" class="category-image">
+                <p class="category-name">Healthy Food</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/chaap1.jpeg" alt="Chaap" class="category-image">
+                <p class="category-name">Soya Chaaps</p>
+            </div>
+            <div class="category-item">
+                <img src="/static/images/cold drinks.jpeg" alt="Drinks" class="category-image">
+                <p class="category-name">Drinks</p>
+            </div>
+        </div>
+        <h2 class="section-title">All Items</h2>
+
+        <div class="menu-grid">
+            {% for item in items %}
+            <div class="menu-item menu-card">
+                <div class="image-block">
+                    <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" class="item-image">
+                </div>
+                <div class="item-details">
+                    <div class="title-rating">
+                        <h3 class="item-title">{{ item.name }}</h3>
+                        <div class="item-rating">
+                            <span class="star-icon">&#9733;</span> {{ item.rating }}
+                        </div>
+                    </div>
+                    <p class="item-description">{{ item.description }}</p>
+                    <p class="item-price">Get items @₹{{ item.price }} only</p>
+
+                    <button class="add-btn" onclick="addToCart('{{ item.id }}')">Add +</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        </main>
+    </div>
+
+    <!-- Welcome Popup -->
+    <div id="welcomePopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <div class="popup-logo">
+                <img src="/static/images/cafelogo.png.jpeg" alt="Cafe Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <h2 style="color: #5DADE2;">Welcome, {{ user_name }}!</h2>
+            <p style="color: #34495E;">Thank you for logging in to HangOut Cafe.</p>
+            <div class="popup-buttons">
+                <button id="continueBtn" class="popup-btn"><i class="fas fa-arrow-right"></i> Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intermediate Popup -->
+    <div id="intermediatePopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2 style="color: #5DADE2;">How can we help you?</h2>
+            <div class="popup-buttons">
+                <button id="intermediateOkBtn" class="popup-btn"><i class="fas fa-check"></i> OK</button>
+                <button id="intermediateCancelBtn" class="popup-btn cancel-btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diet Selection Popup -->
+    <div id="dietPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2 style="color: #5DADE2;">Choose Your Meal Preference</h2>
+            <p style="color: #34495E;">Select your preferred meal type:</p>
+            <div class="popup-buttons">
+                <button id="dietBtn" class="popup-btn diet-btn"><i class="fas fa-leaf"></i> Diet</button>
+                <button id="nonDietBtn" class="popup-btn non-diet-btn"><i class="fas fa-utensils"></i> Non-Diet</button>
+                <button id="cancelBtn" class="popup-btn cancel-btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

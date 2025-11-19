@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Zone | Cart</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    
+
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <h1>My Cart</h1>
+        <div class="cart-container">
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div id="cart-summary" class="cart-summary">
+                <!-- Cart summary will be loaded here -->
+            </div>
+        </div>
+        <!-- Nutrition analytics (totals + charts) -->
+        <div id="nutrition-section" class="nutrition-section" style="display:none;">
+            <h2 class="section-title" style="margin-top:30px;">Total Nutritional Value</h2>
+            <div class="nutrition-cards" id="nutrition-cards"></div>
+            <div class="nutrition-charts">
+                <div class="chart-card">
+                    <canvas id="macroPieChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <canvas id="macroBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div id="empty-cart" class="empty-cart" style="display: none;">
+            <h3>Your cart is empty</h3>
+            <p>Add some delicious items from our cafeteria!</p>
+            <a href="/" class="continue-shopping-btn">Continue Shopping</a>
+        </div>
+    </section>
+
+    
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

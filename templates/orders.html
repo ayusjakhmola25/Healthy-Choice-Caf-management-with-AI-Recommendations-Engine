@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders • HangOut Cafe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo-title">
+            <img src="images/cafelogo.png.jpeg" alt="Cafeteria Logo" class="logo">
+            <h1> HangOut Cafe</h1>
+        </div>
+    </header>
+
+    <main class="orders-section">
+        <div class="orders-header">
+            <h2 class="orders-title">My Orders</h2>
+            <p class="orders-subtitle">View your order history and nutritional insights</p>
+        </div>
+
+        <div id="orders-empty" class="orders-empty" style="display:none;">
+            <div style="font-size:22px;margin-bottom:8px;">No orders yet</div>
+            <div>Add some items to your cart and place an order.</div>
+        </div>
+
+        <div id="orders-list"></div>
+    </main>
+
+    <footer>
+        <p>&#9733; Experience the HangOut Cafe difference. Quality You Can Taste | &copy; 2025 HangOut Cafe</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Optionally ensure user is logged in
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            loadOrdersPage();
+        });
+    </script>
+</body>
+</html>
+
+

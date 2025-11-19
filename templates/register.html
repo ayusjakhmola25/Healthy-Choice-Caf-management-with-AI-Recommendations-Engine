@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Zone | Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h1 class="cafe-title" style="color: brown;"><img src="images/cafelogo.png.jpeg" alt="Cafe Logo" class="cafe-logo">HangOut Cafe</h1>
+
+    <main class="login-main">
+        <div class="form-container login-form">
+            <h2 class="only-register-title"> Register</h2>
+            <form onsubmit="return registerUser(event)">
+                <input type="text" id="regName" placeholder="Full Name" required>
+                <input type="tel" id="regMobile" placeholder="Mobile Number" required>
+                <input type="email" id="regEmail" placeholder="Email ID" required>
+
+                <button type="submit" class="login-button green-btn"> Register</button>
+
+                <p class="register-link-text">Already have an account? <a href="login.html" class="brown-link">Login Here</a></p>
+            </form>
+        </div>
+    </main>
+
+
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

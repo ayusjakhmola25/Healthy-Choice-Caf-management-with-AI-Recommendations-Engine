@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Zone | Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h1 class="cafe-title" style="color: brown;"><img src="images/cafelogo.png.jpeg" alt="Cafe Logo" class="cafe-logo">HangOut Cafe</h1>
+
+    <main class="login-main animation-container" id="mainContainer">
+        
+        <div id="formWrapper">
+            
+            <div class="form-panel login-panel">
+                <div class="form-container login-form">
+                    <h2>Login</h2>
+                    <form onsubmit="return loginUser(event)">
+                        <label for="loginMobile">Mobile Number</label>
+                        <input type="tel" id="loginMobile" placeholder="Enter your mobile number" required>
+
+                        <button type="submit" class="login-button green-btn" id="sendOtpBtn">Send OTP</button>
+
+                        <div id="otpSection" style="display: none;">
+                            <p id="otpMessage" style="color: rgb(236, 14, 14);"></p>
+                            <label for="otpInput">Enter OTP</label>
+                            <input type="text" id="otpInput" name="otpInput" placeholder="Enter OTP" maxlength="4">
+
+                            <div id="timerDisplay">Time remaining: 2:00</div>
+                            <button type="button" id="resendOtpBtn" style="display: none;" onclick="resendOtp()">Resend OTP</button>
+
+                            <button type="button" class="login-button" onclick="verifyOtp()">Verify OTP</button>
+                        </div>
+
+                        <p class="register-link-text">Don’t have an account? <a href="register.html" class="brown-link">Register Here</a></p>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="form-panel register-panel">
+                <div class="form-container login-form">
+                    <h2>User Registration</h2>
+                    <form onsubmit="return registerUser(event)">
+                        <input type="text" id="regName" placeholder="Full Name" required>
+                        <input type="tel" id="regMobile" placeholder="Mobile Number" required>
+                        <input type="email" id="regEmail" placeholder="Email ID" required>
+
+                        <button type="submit" class="login-button green-btn">Register Account</button>
+
+                        <p class="register-link-text">Already have an account? <a href="#" onclick="showLoginPanel(event)" class="brown-link">Login Here</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+    <!-- Welcome Popup -->
+    <div id="welcomePopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2>Welcome, <span id="userName"></span>!</h2>
+            <p>Thank you for logging in to HangOut Cafe.</p>
+            <button id="continueBtn" class="popup-btn">Continue</button>
+        </div>
+    </div>
+
+    <!-- Diet Selection Popup -->
+    <div id="dietPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2>Choose Your Meal Preference</h2>
+            <p>Select your preferred meal type:</p>
+            <div class="popup-buttons">
+                <button id="dietBtn" class="popup-btn diet-btn">Diet</button>
+                <button id="nonDietBtn" class="popup-btn non-diet-btn">Non-Diet</button>
+                <button id="cancelBtn" class="popup-btn cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+mysql-connector-python==8.1.0
+pandas==2.0.3
+reportlab==4.0.4
