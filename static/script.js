@@ -1356,6 +1356,61 @@ function clearAllOrders() {
     }
 }
 
+// Function to load login history
+async function loadLoginHistory() {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const container = document.getElementById('loginHistoryContainer');
+
+    if (!container || !user.mobile) return;
+
+    try {
+        const response = await fetch('http://127.0.0.1:3000/get-login-history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mobile: user.mobile })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const history = data.loginHistory || [];
+
+            if (history.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #6b7b88; padding: 20px;">No login history available</div>';
+                return;
+            }
+
+            const historyHTML = history.map(entry => {
+                const loginTime = new Date(entry.login_time);
+                const formattedTime = loginTime.toLocaleString('en-IN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                return `
+                    <div style="border-bottom: 1px solid #e0e0e0; padding: 8px 0; font-size: 12px; color: #4b5563;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>${formattedTime}</span>
+                            <span style="color: #6b7b88;">Login #${entry.id}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = historyHTML;
+        } else {
+            container.innerHTML = '<div style="text-align: center; color: #6b7b88; padding: 20px;">Unable to load login history</div>';
+        }
+    } catch (error) {
+        console.error('Error fetching login history:', error);
+        container.innerHTML = '<div style="text-align: center; color: #6b7b88; padding: 20px;">Error loading login history</div>';
+    }
+}
+
 // Render profile insights (totals and averages from stored orders)
 async function renderProfileInsights() {
     const user = JSON.parse(localStorage.getItem('user')) || {};
@@ -1391,6 +1446,9 @@ async function renderProfileInsights() {
     } catch (error) {
         console.error('Error fetching login count:', error);
     }
+
+    // Load login history
+    loadLoginHistory();
 
     if (!orders.length) return;
 

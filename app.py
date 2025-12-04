@@ -16,8 +16,8 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = 'your_secret_key_here'  # Change to a secure key in production
 
-# Configure SQLAlchemy - Using SQLite for development
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///c:/MAIN/MINI/Cafe-Zone-Project/instance/cafe_zone.db'
+# Configure SQLAlchemy - Using MySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ayush123@localhost:3306/cafe_users'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -320,6 +320,25 @@ def login_count():
     except Exception as e:
         print(f"Error fetching login count: {e}")
         return jsonify({'error': 'Failed to fetch login count'}), 500
+
+@app.route('/get-login-history', methods=['POST'])
+def get_login_history():
+    data = request.get_json()
+    mobile = data.get('mobile')
+
+    if not mobile:
+        return jsonify({'error': 'Mobile number is required'}), 400
+
+    try:
+        login_history = LoginHistory.query.filter_by(mobile=mobile).order_by(LoginHistory.login_time.desc()).all()
+        history_data = [{
+            'id': entry.id,
+            'login_time': entry.login_time.isoformat()
+        } for entry in login_history]
+        return jsonify({'loginHistory': history_data})
+    except Exception as e:
+        print(f"Error fetching login history: {e}")
+        return jsonify({'error': 'Failed to fetch login history'}), 500
 
 @app.route('/food-items', methods=['GET'])
 def get_food_items():
