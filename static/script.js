@@ -643,7 +643,7 @@ function loadCartCount() {
 
 // Function to update cart quantity
 function updateCartQuantity(itemId, change) {
-    const item = cart.find(item => item.id === itemId);
+    const item = cart.find(item => item.id == itemId);
     if (item) {
         item.quantity += change;
         if (item.quantity <= 0) {
@@ -657,7 +657,7 @@ function updateCartQuantity(itemId, change) {
 
 // Function to remove item from cart
 function removeFromCart(itemId) {
-    cart = cart.filter(item => item.id !== itemId);
+    cart = cart.filter(item => item.id != itemId);
     saveCart();
     loadCartPage();
 }
@@ -905,7 +905,9 @@ async function saveOrder(status, paymentMethod) {
     localStorage.setItem('orders', JSON.stringify(existing));
 }
 
-function loadOrdersPage() {
+let globalFoodItems = [];
+
+async function loadOrdersPage() {
     const list = document.getElementById('orders-list');
     const empty = document.getElementById('orders-empty');
 
@@ -918,7 +920,17 @@ function loadOrdersPage() {
 
     if (!list) return;
 
-    list.innerHTML = orders.map(o => `
+    // Load food items for add to cart functionality
+    try {
+        const response = await fetch('http://127.0.0.1:3000/food-items');
+        if (response.ok) {
+            globalFoodItems = await response.json();
+        }
+    } catch (e) {
+        console.error('Error loading food items for orders:', e);
+    }
+
+    list.innerHTML = orders.map((o, index) => `
         <div class="order-card">
             <div class="order-bar">
                 <div>Order ${o.id}<div style="font-size:12px;color:#7a8188;">${new Date(o.date).toLocaleDateString()}</div></div>
@@ -936,9 +948,34 @@ function loadOrdersPage() {
             </div>
             <div class="order-footer">
                 <button class="invoice-btn" onclick="alert('Invoice already downloaded during checkout.')">View Invoice</button>
+                <button class="add-to-cart-btn" onclick="addOrderToCart(${index})" style="margin-left:10px;">Add to Cart</button>
             </div>
         </div>
     `).join('');
+}
+
+function addOrderToCart(orderIndex) {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const order = orders[orderIndex];
+    if (!order) return;
+
+    if (confirm(`Add the entire order ${order.id} to cart?`)) {
+        let addedCount = 0;
+        order.items.forEach(item => {
+            const fullItem = globalFoodItems.find(fi => fi.name === item.name);
+            if (fullItem) {
+                for (let i = 0; i < item.quantity; i++) {
+                    addToCart(fullItem.id, fullItem.name, fullItem.price, fullItem.image_url, fullItem.protein, fullItem.carbs, fullItem.fats, fullItem.calories);
+                }
+                addedCount += item.quantity;
+            } else {
+                alert(`Item "${item.name}" not found in current menu.`);
+            }
+        });
+        if (addedCount > 0) {
+            alert(`${addedCount} item(s) from order ${order.id} added to cart!`);
+        }
+    }
 }
 
 // --- Cart nutrition rendering ---
