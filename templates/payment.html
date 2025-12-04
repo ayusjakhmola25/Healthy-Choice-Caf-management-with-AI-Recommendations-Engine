@@ -13,6 +13,23 @@
     <section class="payment-section">
         <h1 style="color: #804040; font-weight: 900; font-size: 50px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">Payment</h1>
         <div class="payment-container">
+            <div id="guest-details" class="guest-details" style="display: none;">
+                <h3>Enter Your Details</h3>
+                <form id="guest-form">
+                    <div class="form-group">
+                        <label for="guestName">Name</label>
+                        <input type="text" id="guestName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestMobile">Mobile</label>
+                        <input type="text" id="guestMobile" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestEmail">Email</label>
+                        <input type="email" id="guestEmail" required>
+                    </div>
+                </form>
+            </div>
             <div id="order-summary" class="order-summary">
                 <!-- Order summary will be loaded here -->
             </div>

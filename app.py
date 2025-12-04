@@ -55,6 +55,17 @@ class LoginHistory(db.Model):
     email = db.Column(db.String(255))
     login_time = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+# GuestOrder Model
+class GuestOrder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    mobile = db.Column(db.String(15), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    order_data = db.Column(db.Text, nullable=False)  # JSON string of cart items
+    total_amount = db.Column(db.Float, nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)
+    order_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+
 
 
 # In-memory storage for OTP (temporary)
@@ -467,6 +478,40 @@ def add_to_cart():
     session['cart'] = cart
 
     return jsonify({'success': True, 'message': 'Item added to cart', 'cart': cart})
+
+@app.route('/save-order', methods=['POST'])
+def save_order():
+    data = request.get_json()
+    name = data.get('name')
+    mobile = data.get('mobile')
+    email = data.get('email')
+    order_data = data.get('order_data')  # JSON string of cart items
+    total_amount = data.get('total_amount')
+    payment_method = data.get('payment_method')
+
+    if not name or not mobile or not email or not order_data or not total_amount or not payment_method:
+        return jsonify({'error': 'All fields are required'}), 400
+
+    try:
+        # Save to GuestOrder table
+        guest_order = GuestOrder(
+            name=name,
+            mobile=mobile,
+            email=email,
+            order_data=order_data,
+            total_amount=total_amount,
+            payment_method=payment_method
+        )
+        db.session.add(guest_order)
+        db.session.commit()
+
+        print(f"Guest order saved: {name}, {mobile}, {email}, {total_amount}")
+
+        return jsonify({'success': True, 'message': 'Order saved successfully', 'order_id': guest_order.id})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error saving guest order: {e}")
+        return jsonify({'error': 'Failed to save order'}), 500
 
 @app.route('/logout', methods=['POST'])
 def logout():

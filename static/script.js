@@ -718,12 +718,23 @@ function proceedToPayment() {
 // Function to load payment page
 function loadPaymentPage() {
     const orderSummary = document.getElementById('order-summary');
+    const guestDetails = document.getElementById('guest-details');
     cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     if (cart.length === 0) {
         alert('Your cart is empty!');
         window.location.href = 'cart.html';
         return;
+    }
+
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    if (!user.name || !user.mobile || !user.email) {
+        // Show guest details form
+        guestDetails.style.display = 'block';
+    } else {
+        // Hide guest details form
+        guestDetails.style.display = 'none';
     }
 
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -794,19 +805,58 @@ async function processCardPayment(event) {
     const user = JSON.parse(localStorage.getItem('user')) || {};
     const totalAmount = calculateTotal();
 
-    // Save order before clearing cart and generate invoice
-    await saveOrder('paid', 'Card Payment');
-    await generateAndDownloadInvoice('Card Payment', user.name, user.mobile);
+    // Get guest details if not logged in
+    let customerName = user.name;
+    let customerMobile = user.mobile;
+    let customerEmail = user.email;
 
-    // Simulate payment processing
-    alert('Card payment successful! Your order has been placed. Invoice downloaded.');
+    if (!customerName || !customerMobile || !customerEmail) {
+        customerName = document.getElementById('guestName').value;
+        customerMobile = document.getElementById('guestMobile').value;
+        customerEmail = document.getElementById('guestEmail').value;
 
-    // Clear cart
-    localStorage.removeItem('cart');
-    cart = [];
+        if (!customerName || !customerMobile || !customerEmail) {
+            alert('Please fill in guest details.');
+            return;
+        }
+    }
 
-    // Redirect to cafeteria
-    window.location.href = 'cafeteria.html';
+    try {
+        // Save order to database
+        const saveResponse = await fetch('http://127.0.0.1:3000/save-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: customerName,
+                mobile: customerMobile,
+                email: customerEmail,
+                order_data: JSON.stringify(cart),
+                total_amount: totalAmount,
+                payment_method: 'Card Payment'
+            })
+        });
+
+        if (!saveResponse.ok) {
+            throw new Error('Failed to save order');
+        }
+
+        // Generate and download invoice
+        await generateAndDownloadInvoice('Card Payment', customerName, customerMobile);
+
+        // Simulate payment processing
+        alert('Card payment successful! Your order has been placed. Invoice downloaded.');
+
+        // Clear cart
+        localStorage.removeItem('cart');
+        cart = [];
+
+        // Redirect to cafeteria
+        window.location.href = 'cafeteria.html';
+    } catch (error) {
+        alert('Error processing payment: ' + error.message);
+    }
 }
 
 // Function to process cash on delivery
@@ -817,18 +867,57 @@ async function processCodPayment() {
         const user = JSON.parse(localStorage.getItem('user')) || {};
         const totalAmount = calculateTotal();
 
-        // Save order and Generate invoice
-        await saveOrder('paid', 'Cash on Delivery');
-        await generateAndDownloadInvoice('Cash on Delivery', user.name, user.mobile);
+        // Get guest details if not logged in
+        let customerName = user.name;
+        let customerMobile = user.mobile;
+        let customerEmail = user.email;
 
-        alert('Cash on Delivery order confirmed! Your order will be delivered in 30-45 minutes. Invoice downloaded.');
+        if (!customerName || !customerMobile || !customerEmail) {
+            customerName = document.getElementById('guestName').value;
+            customerMobile = document.getElementById('guestMobile').value;
+            customerEmail = document.getElementById('guestEmail').value;
 
-        // Clear cart
-        localStorage.removeItem('cart');
-        cart = [];
+            if (!customerName || !customerMobile || !customerEmail) {
+                alert('Please fill in guest details.');
+                return;
+            }
+        }
 
-        // Redirect to cafeteria
-        window.location.href = 'cafeteria.html';
+        try {
+            // Save order to database
+            const saveResponse = await fetch('http://127.0.0.1:3000/save-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: customerName,
+                    mobile: customerMobile,
+                    email: customerEmail,
+                    order_data: JSON.stringify(cart),
+                    total_amount: totalAmount,
+                    payment_method: 'Cash on Delivery'
+                })
+            });
+
+            if (!saveResponse.ok) {
+                throw new Error('Failed to save order');
+            }
+
+            // Generate and download invoice
+            await generateAndDownloadInvoice('Cash on Delivery', customerName, customerMobile);
+
+            alert('Cash on Delivery order confirmed! Your order will be delivered in 30-45 minutes. Invoice downloaded.');
+
+            // Clear cart
+            localStorage.removeItem('cart');
+            cart = [];
+
+            // Redirect to cafeteria
+            window.location.href = 'cafeteria.html';
+        } catch (error) {
+            alert('Error processing COD order: ' + error.message);
+        }
     }
 }
 
@@ -1194,14 +1283,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load food items on cafeteria page
     if (window.location.pathname.includes('cafeteria')) {
-        // Check if user is logged in
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) {
-            alert('Please login first!');
-            window.location.href = '/login';
-            return;
-        }
-
     // Show welcome popup
     const welcomePopup = document.getElementById('welcomePopup');
     const continueBtn = document.getElementById('continueBtn');
