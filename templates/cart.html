@@ -4,44 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cafe Zone | Cart</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    
-
-    <!-- Cart Section -->
-    <section class="cart-section">
-        <h1>My Cart</h1>
-        <div class="cart-container">
-            <div id="cart-items" class="cart-items">
-                <!-- Cart items will be loaded here -->
-            </div>
-            <div id="cart-summary" class="cart-summary">
-                <!-- Cart summary will be loaded here -->
-            </div>
-        </div>
-        <!-- Nutrition analytics (totals + charts) -->
-        <div id="nutrition-section" class="nutrition-section" style="display:none;">
-            <h2 class="section-title" style="margin-top:30px;">Total Nutritional Value</h2>
-            <div class="nutrition-cards" id="nutrition-cards"></div>
-            <div class="nutrition-charts">
-                <div class="chart-card">
-                    <canvas id="macroPieChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <canvas id="macroBarChart"></canvas>
+    <div class="layout">
+        <aside class="side-nav">
+            <div class="brand">
+                <img src="/static/images/cafelogo.jpeg" alt="Cafe" class="brand-logo">
+                <div class="brand-text">
+                    <div class="brand-name">Hangout Cafe</div>
+                    <div class="brand-tag">Healthy Eating Hub</div>
                 </div>
             </div>
-        </div>
-        <div id="empty-cart" class="empty-cart" style="display: none;">
-            <h3>Your cart is empty</h3>
-            <p>Add some delicious items from our cafeteria!</p>
-            <a href="/" class="continue-shopping-btn">Continue Shopping</a>
-        </div>
-    </section>
+            <nav class="side-links">
+                <a href="/cafeteria" class="side-link"><span>🍽️</span><span>Menu</span></a>
+                <a href="/cart" class="side-link active"><span>🛒</span><span>My Cart</span><span class="badge" id="cart-count">0</span></a>
+                <a href="/orders" class="side-link"><span>📦</span><span>My Orders</span></a>
+                <a href="/profile" class="side-link"><span>👤</span><span>Profile</span></a>
+            </nav>
+            <div class="side-footer">
+                <button class="logout-btn" onclick="logout()">↪ Logout</button>
+            </div>
+        </aside>
 
-    
+        <main class="content">
+            <header class="page-header">
+                <h1 class="page-title">My Cart</h1>
+                <div class="page-subtitle">Review your selected items</div>
+            </header>
+
+            <!-- Cart Section -->
+            <section class="cart-section">
+                <div class="cart-container">
+                    <div id="cart-items" class="cart-items">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+                    <div id="cart-summary" class="cart-summary">
+                        <!-- Cart summary will be loaded here -->
+                    </div>
+                    <div id="cart-nutrition-summary" class="cart-nutrition-summary" style="display:none;">
+                        <!-- Nutritional summary will be loaded here -->
+                    </div>
+                </div>
+                <!-- Nutrition analytics (totals + charts) -->
+                <div id="nutrition-section" class="nutrition-section" style="display:none;">
+                    <h2 class="section-title" style="margin-top:30px;">Total Nutritional Value</h2>
+                    <div class="nutrition-cards" id="nutrition-cards"></div>
+                    <div class="nutrition-charts">
+                        <div class="chart-card">
+                            <canvas id="macroPieChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <canvas id="macroBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div id="empty-cart" class="empty-cart" style="display: none;">
+                    <h3>Your cart is empty</h3>
+                    <p>Add some delicious items from our cafeteria!</p>
+                    <a href="/cafeteria" class="continue-shopping-btn">Continue Shopping</a>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script src="/static/script.js"></script>
 </body>

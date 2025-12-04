@@ -8,30 +8,41 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="logo-title">
-            <img src="/static/images/cafelogo.jpeg" alt="Cafeteria Logo" class="logo">
-            <h1> HangOut Cafe</h1>
-        </div>
-    </header>
+    <div class="layout">
+        <aside class="side-nav">
+            <div class="brand">
+                <img src="/static/images/cafelogo.jpeg" alt="Cafe" class="brand-logo">
+                <div class="brand-text">
+                    <div class="brand-name">Hangout Cafe</div>
+                    <div class="brand-tag">Healthy Eating Hub</div>
+                </div>
+            </div>
+            <nav class="side-links">
+                <a href="/" class="side-link"><span>🍽️</span><span>Menu</span></a>
+                <a href="/cart" class="side-link"><span>🛒</span><span>My Cart</span><span class="badge" id="cart-count">0</span></a>
+                <a href="/orders" class="side-link active"><span>📦</span><span>My Orders</span></a>
+                <a href="/profile" class="side-link"><span>👤</span><span>Profile</span></a>
+            </nav>
+            <div class="side-footer">
+                <button class="logout-btn" onclick="logout()">↪ Logout</button>
+            </div>
+        </aside>
 
-    <main class="orders-section">
-        <div class="orders-header">
-            <h2 class="orders-title">My Orders</h2>
-            <p class="orders-subtitle">View your order history and nutritional insights</p>
-        </div>
+        <main class="content">
+            <header class="page-header">
+                <h1 class="page-title">My Orders</h1>
+                <div class="page-subtitle">View your order history and nutritional insights</div>
+                <button class="clear-orders-btn" onclick="clearAllOrders()" style="margin-top:10px; background:#e74c3c; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Clear All Orders</button>
+            </header>
 
-        <div id="orders-empty" class="orders-empty" style="display:none;">
-            <div style="font-size:22px;margin-bottom:8px;">No orders yet</div>
-            <div>Add some items to your cart and place an order.</div>
-        </div>
+            <div id="orders-empty" class="orders-empty" style="display:none;">
+                <div style="font-size:22px;margin-bottom:8px;">No orders yet</div>
+                <div>Add some items to your cart and place an order.</div>
+            </div>
 
-        <div id="orders-list"></div>
-    </main>
-
-    <footer>
-        <p>&#9733; Experience the HangOut Cafe difference. Quality You Can Taste | &copy; 2025 HangOut Cafe</p>
-    </footer>
+            <div id="orders-list"></div>
+        </main>
+    </div>
 
     <script src="/static/script.js"></script>
     <script>
@@ -44,6 +55,7 @@
                 return;
             }
             loadOrdersPage();
+            loadCartCount();
         });
     </script>
 </body>

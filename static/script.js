@@ -6,7 +6,7 @@ async function registerUser(e) {
   const email = document.getElementById('regEmail').value;
 
   try {
-    const response = await fetch('http://localhost:3000/register', {
+    const response = await fetch('http://127.0.0.1:3000/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ async function loginUser(e) {
 function logout() {
   alert('Logged out successfully!');
   localStorage.clear(); // Clear all localStorage data
-  window.location.href = 'login.html'; // Redirect to login page
+  window.location.href = '/login'; // Redirect to login page
 }
 
 // --- NEW PROFILE FUNCTIONS ---
@@ -94,7 +94,7 @@ async function updateProfile(e) {
     };
 
     try {
-        const response = await fetch('http://localhost:3000/update-profile', {
+    const response = await fetch('http://127.0.0.1:3000/update-profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -158,7 +158,7 @@ async function generateOtp() {
   const mobile = document.getElementById('loginMobile').value;
 
   try {
-    const response = await fetch('http://localhost:3000/login', {
+    const response = await fetch('http://127.0.0.1:3000/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -282,14 +282,19 @@ function handleDietSelection(dietPreference) {
 
 // Function to verify OTP (API call)
 async function verifyOtp() {
-  // Only allow OTP verification on login.html page
-  if (!window.location.pathname.includes('login.html')) {
+  console.log('verifyOtp called');
+  // Only allow OTP verification on login page (served at / or /login)
+  if (window.location.pathname !== '/' && !window.location.pathname.includes('login.html')) {
+    console.log('Not on login page');
     return;
   }
 
   const enteredOtp = document.getElementById('otpInput').value.trim();
+  console.log('Entered OTP:', enteredOtp);
   const otpId = localStorage.getItem('otpId');
+  console.log('OTP ID:', otpId);
   const expiry = parseInt(localStorage.getItem('otpExpiry'));
+  console.log('Expiry:', expiry, 'Current time:', Date.now());
 
   if (Date.now() > expiry) {
     alert('OTP expired! Please resend.');
@@ -297,7 +302,7 @@ async function verifyOtp() {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/verify-login-otp', {
+    const response = await fetch('http://127.0.0.1:3000/verify-login-otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -314,7 +319,7 @@ async function verifyOtp() {
     if (data.success) {
       // Fetch user data after successful login
       const mobile = document.getElementById('loginMobile').value;
-      const checkResponse = await fetch('http://localhost:3000/check-user', {
+      const checkResponse = await fetch('http://127.0.0.1:3000/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -330,7 +335,7 @@ async function verifyOtp() {
       }
 
       // Always redirect to cafeteria after successful login
-      window.location.href = 'cafeteria.html';
+      window.location.href = '/cafeteria';
     } else {
       alert('Invalid OTP!');
     }
@@ -362,13 +367,14 @@ function updateCartCount() {
 
 // Function to add item to cart
 function addToCart(itemId, name, price, image_url, protein, carbs, fats, calories) {
+    const itemName = name || 'Item';
     const existingItem = cart.find(item => item.id === itemId);
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
         cart.push({
             id: itemId,
-            name: name,
+            name: itemName,
             price: parseFloat(price),
             image_url: image_url,
             protein: parseFloat(protein || 0),
@@ -380,7 +386,7 @@ function addToCart(itemId, name, price, image_url, protein, carbs, fats, calorie
     }
     saveCart();
     updateCartCount();
-    alert(`${name} added to cart!`);
+    alert(`${itemName} added to cart!`);
 }
 
 // Function to increase quantity
@@ -454,7 +460,7 @@ async function loadFoodItems() {
 
         // Backend first (original behavior)
         try {
-            const response = await fetch('http://localhost:3000/food-items');
+            const response = await fetch('http://127.0.0.1:3000/food-items');
             if (response.ok) {
                 foodItems = await response.json();
                 try { localStorage.setItem('cachedFoodItems', JSON.stringify(foodItems)); } catch (_) {}
@@ -481,6 +487,13 @@ async function loadFoodItems() {
                 { id:'sample3', name:'Aloo Tikki Burger', price:80, image_url:'images/burger1.jpeg', protein:10, carbs:52, fats:20, calories:430, category:'non-diet', description:'Tasty treat.' }
             ];
         }
+
+        // Ensure image URLs are absolute paths
+        foodItems.forEach(item => {
+            if (!item.image_url.startsWith('/')) {
+                item.image_url = '/static/' + item.image_url;
+            }
+        });
 
         // Filter based on preference
         const dietPreference = localStorage.getItem('dietPreference');
@@ -569,7 +582,7 @@ function loadCartPage() {
     // Render cart items
     cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.image_url}" alt="${item.name}" class="cart-item-image">
+            <img src="${item.image_url || '/static/images/default-food.jpg'}" alt="${item.name}" class="cart-item-image">
             <div class="cart-item-details">
                 <h4>${item.name}</h4>
                 <p>₹${item.price} each</p>
@@ -592,11 +605,27 @@ function loadCartPage() {
     const gst = subTotal * 0.18;
     const grandTotal = subTotal + gst;
 
+    // Calculate nutritional totals
+    const nutritionTotals = cart.reduce((acc, item) => {
+        acc.protein += (item.protein || 0) * item.quantity;
+        acc.carbs += (item.carbs || 0) * item.quantity;
+        acc.fats += (item.fats || 0) * item.quantity;
+        acc.calories += (item.calories || 0) * item.quantity;
+        return acc;
+    }, { protein: 0, carbs: 0, fats: 0, calories: 0 });
+
     cartSummary.innerHTML = `
         <h3>Order Summary</h3>
         <div class="summary-row"><span>Subtotal</span><span>₹${subTotal.toFixed(2)}</span></div>
         <div class="summary-row"><span>GST (18%)</span><span>₹${gst.toFixed(2)}</span></div>
         <div class="summary-row total"><span>Total</span><span>₹${grandTotal.toFixed(2)}</span></div>
+        <div class="nutrition-summary">
+            <h4>Nutritional Summary</h4>
+            <div class="nutrition-row"><span>Protein</span><span>${nutritionTotals.protein.toFixed(1)}g</span></div>
+            <div class="nutrition-row"><span>Carbs</span><span>${nutritionTotals.carbs.toFixed(1)}g</span></div>
+            <div class="nutrition-row"><span>Fats</span><span>${nutritionTotals.fats.toFixed(1)}g</span></div>
+            <div class="nutrition-row"><span>Calories</span><span>${Math.round(nutritionTotals.calories)}</span></div>
+        </div>
         <button class="checkout-btn" onclick="proceedToPayment()">Proceed to Payment</button>
         <div style="font-size:12px;color:#777;margin-top:6px;">Payment will be processed automatically • Secure checkout</div>
     `;
@@ -682,7 +711,7 @@ function proceedToPayment() {
     const hide = showProcessingOverlay();
     setTimeout(() => {
         hide && hide();
-        window.location.href = 'payment.html';
+        window.location.href = '/payment';
     }, 1600);
 }
 
@@ -806,7 +835,7 @@ async function processCodPayment() {
 // Function to generate and download invoice
 async function generateAndDownloadInvoice(paymentMethod, customerName, customerMobile) {
     try {
-        const response = await fetch('http://localhost:3000/generate-invoice', {
+        const response = await fetch('http://127.0.0.1:3000/generate-invoice', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1047,7 +1076,7 @@ async function loadAIRecommendations() {
         // Backend first (original behavior)
         let items = [];
         try {
-            const res = await fetch('http://localhost:3000/food-items');
+            const res = await fetch('http://127.0.0.1:3000/food-items');
             if (res.ok) {
                 items = await res.json();
                 try { localStorage.setItem('cachedFoodItems', JSON.stringify(items)); } catch (_) {}
@@ -1082,6 +1111,12 @@ async function loadAIRecommendations() {
         }
 
         const top = items.slice(0, 5);
+        // Ensure image URLs are absolute paths
+        top.forEach(it => {
+            if (!it.image_url.startsWith('/')) {
+                it.image_url = '/static/' + it.image_url;
+            }
+        });
         cardsContainer.innerHTML = top.map(it => `
             <div class="ai-card">
                 <img src="${it.image_url}" alt="${it.name}">
@@ -1121,30 +1156,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load food items on cafeteria page
-    if (window.location.pathname.includes('cafeteria.html')) {
+    if (window.location.pathname.includes('cafeteria')) {
         // Check if user is logged in
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             alert('Please login first!');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
             return;
         }
 
-        // Show welcome popup
-        const userNameElement = document.getElementById('userName');
-        const welcomePopup = document.getElementById('welcomePopup');
-        const continueBtn = document.getElementById('continueBtn');
+    // Show welcome popup
+    const welcomePopup = document.getElementById('welcomePopup');
+    const continueBtn = document.getElementById('continueBtn');
 
-        if (userNameElement && welcomePopup && continueBtn) {
-            userNameElement.textContent = user.name;
-            welcomePopup.style.display = 'flex';
+    if (welcomePopup && continueBtn) {
+        welcomePopup.style.display = 'flex';
 
-            // Handle continue button to show intermediate popup
-            continueBtn.addEventListener('click', () => {
-                welcomePopup.style.display = 'none';
-                showIntermediatePopup();
-            });
-        }
+        // Handle continue button to show intermediate popup
+        continueBtn.addEventListener('click', () => {
+            welcomePopup.style.display = 'none';
+            showIntermediatePopup();
+        });
+    }
 
         // Render AI recommendations banner
         loadAIRecommendations();
@@ -1163,12 +1196,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load cart page
-    if (window.location.pathname.includes('cart.html')) {
+    if (window.location.pathname.includes('/cart')) {
         loadCartPage();
     }
 
     // Load payment page
-    if (window.location.pathname.includes('payment.html')) {
+    if (window.location.pathname.includes('/payment')) {
         loadPaymentPage();
     }
 
@@ -1196,6 +1229,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Function to clear all orders
+function clearAllOrders() {
+    if (confirm('Are you sure you want to clear all orders? This action cannot be undone.')) {
+        localStorage.removeItem('orders');
+        alert('All orders have been cleared.');
+        loadOrdersPage(); // Reload the orders page to show empty state
+    }
+}
+
 // Render profile insights (totals and averages from stored orders)
 async function renderProfileInsights() {
     const user = JSON.parse(localStorage.getItem('user')) || {};
@@ -1216,7 +1258,7 @@ async function renderProfileInsights() {
 
     // Fetch login count from server
     try {
-        const response = await fetch('http://localhost:3000/login-count', {
+        const response = await fetch('http://127.0.0.1:3000/login-count', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -94,7 +94,7 @@ Cafe Zone is an innovative web application designed to streamline café operatio
    ```
 
 6. **Access the application**
-   - Open your browser and navigate to `http://localhost:3000`
+   - Open your browser and navigate to `http://127.0.0.1:3000`
 
 ## 📖 Usage
 

@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <h1 class="cafe-title" style="color: brown;"><img src="images/cafelogo.png.jpeg" alt="Cafe Logo" class="cafe-logo">HangOut Cafe</h1>
+    <h1 class="cafe-title" style="color: brown;"><img src="/static/images/cafelogo.jpeg" alt="Cafe Logo" class="cafe-logo">HangOut Cafe</h1>
 
     <main class="login-main animation-container" id="mainContainer">
         
@@ -34,25 +34,26 @@
                             <button type="button" class="login-button" onclick="verifyOtp()">Verify OTP</button>
                         </div>
 
-                        <p class="register-link-text">Don’t have an account? <a href="register.html" class="brown-link">Register Here</a></p>
+                        <p class="register-link-text">Don’t have an account? <a href="#" onclick="showRegisterPanel()" class="brown-link">Register Here</a></p>
                     </form>
                 </div>
             </div>
-            
+
             <div class="form-panel register-panel">
                 <div class="form-container login-form">
-                    <h2>User Registration</h2>
+                    <h2 class="only-register-title"> Register</h2>
                     <form onsubmit="return registerUser(event)">
                         <input type="text" id="regName" placeholder="Full Name" required>
                         <input type="tel" id="regMobile" placeholder="Mobile Number" required>
                         <input type="email" id="regEmail" placeholder="Email ID" required>
 
-                        <button type="submit" class="login-button green-btn">Register Account</button>
+                        <button type="submit" class="login-button green-btn"> Register</button>
 
-                        <p class="register-link-text">Already have an account? <a href="#" onclick="showLoginPanel(event)" class="brown-link">Login Here</a></p>
+                        <p class="register-link-text">Already have an account? <a href="#" onclick="showLoginPanel()" class="brown-link">Login Here</a></p>
                     </form>
                 </div>
             </div>
+
         </div>
     </main>
 

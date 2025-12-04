@@ -103,7 +103,7 @@
                     <p class="item-description">{{ item.description }}</p>
                     <p class="item-price">Get items @₹{{ item.price }} only</p>
 
-                    <button class="add-btn" onclick="addToCart('{{ item.id }}')">Add +</button>
+                    <button class="add-btn" onclick="addToCart('{{ item.id }}', '{{ item.name }}', '{{ item.price }}', '{{ item.image_url }}', '{{ item.protein }}', '{{ item.carbs }}', '{{ item.fats }}', '{{ item.calories }}')">Add +</button>
                 </div>
             </div>
             {% endfor %}

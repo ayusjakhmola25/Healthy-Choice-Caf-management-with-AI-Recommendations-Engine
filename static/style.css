@@ -692,6 +692,34 @@ body {
     background: #218838;
 }
 
+/* Nutritional Summary in Cart */
+.nutrition-summary {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.nutrition-summary h4 {
+    margin: 0 0 10px 0;
+    color: #2e7d32;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.nutrition-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.nutrition-row:last-child {
+    margin-bottom: 0;
+}
+
 .empty-cart {
     text-align: center;
     padding: 50px 20px;
@@ -1648,3 +1676,300 @@ footer p {
 /* Tighten stat/insight typography */
 .stats-card .small-card .small-value { font-size:24px; }
 .insights-card .metric-box { background:#fffaf4; border:1px solid #f1eadf; }
+
+/* ===== Database Connectivity Styles ===== */
+
+/* Database Status Indicator */
+.db-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.db-status.connected {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.db-status.disconnected {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    color: white;
+}
+
+.db-status.connecting {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #333;
+}
+
+.db-status-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: dbPulse 2s infinite;
+}
+
+.db-status.connected .db-status-icon {
+    background: #fff;
+}
+
+.db-status.disconnected .db-status-icon {
+    background: #fff;
+}
+
+.db-status.connecting .db-status-icon {
+    background: #333;
+}
+
+@keyframes dbPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+}
+
+/* Database Error Messages */
+.db-error-message {
+    background: linear-gradient(135deg, #ffe6e6, #ffcccc);
+    border: 1px solid #ff9999;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    color: #cc0000;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.db-error-message::before {
+    content: '⚠️';
+    font-size: 16px;
+}
+
+.db-success-message {
+    background: linear-gradient(135deg, #e6f7ea, #d4edda);
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    color: #155724;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.db-success-message::before {
+    content: '✅';
+    font-size: 16px;
+}
+
+/* Database Connection Indicator in Sidebar */
+.db-connection-indicator {
+    position: absolute;
+    bottom: 60px;
+    left: 14px;
+    right: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.db-connection-indicator.connected {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.db-connection-indicator.disconnected {
+    background: #ffeaea;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.db-connection-indicator .indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.db-connection-indicator.connected .indicator-dot {
+    background: #4caf50;
+}
+
+.db-connection-indicator.disconnected .indicator-dot {
+    background: #f44336;
+}
+
+/* Database Loading States */
+.db-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-style: italic;
+}
+
+.db-loading::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border: 2px solid #5DADE2;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: dbSpin 1s linear infinite;
+}
+
+@keyframes dbSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Database Table Styles */
+.db-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.db-table th,
+.db-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.db-table th {
+    background: linear-gradient(135deg, #5DADE2, #4682B4);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.db-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.db-table tr:hover {
+    background: #e8f0f5;
+}
+
+/* Database Form Elements */
+.db-form-group {
+    margin-bottom: 16px;
+}
+
+.db-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #34495E;
+}
+
+.db-form-group input,
+.db-form-group select,
+.db-form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.db-form-group input:focus,
+.db-form-group select:focus,
+.db-form-group textarea:focus {
+    border-color: #5DADE2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(93, 173, 226, 0.1);
+}
+
+/* Database Modal/Dialog */
+.db-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.db-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.db-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.db-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #34495E;
+    margin: 0;
+}
+
+.db-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.db-modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}

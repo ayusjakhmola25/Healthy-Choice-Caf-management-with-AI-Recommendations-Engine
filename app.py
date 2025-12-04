@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-import mysql.connector
 import pandas as pd
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -18,19 +17,11 @@ CORS(app)
 app.secret_key = 'your_secret_key_here'  # Change to a secure key in production
 
 # Configure SQLAlchemy - Using SQLite for development
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafe_zone.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///c:/MAIN/MINI/Cafe-Zone-Project/instance/cafe_zone.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
-
-# MySQL connection
-db_config = {
-    'host': os.environ.get('DB_HOST', 'localhost'),
-    'user': os.environ.get('DB_USER', 'root'),
-    'password': os.environ.get('DB_PASSWORD', 'ayush123'),
-    'database': os.environ.get('DB_NAME', 'cafe_users')
-}
 
 # FoodItem Model
 class FoodItem(db.Model):
@@ -41,6 +32,10 @@ class FoodItem(db.Model):
     description = db.Column(db.String(200))
     image_url = db.Column(db.String(200))  # Image ka path
     rating = db.Column(db.Float)
+    protein = db.Column(db.Float)  # Protein in grams
+    carbs = db.Column(db.Float)    # Carbohydrates in grams
+    fats = db.Column(db.Float)     # Fats in grams
+    calories = db.Column(db.Integer)  # Calories
 
 # User Model
 class User(db.Model):
@@ -60,41 +55,7 @@ class LoginHistory(db.Model):
     email = db.Column(db.String(255))
     login_time = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-def get_db_connection():
-    return mysql.connector.connect(**db_config)
 
-# Initialize database
-def initialize_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Create users table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            mobile VARCHAR(15) UNIQUE NOT NULL,
-            email VARCHAR(255) UNIQUE NOT NULL,
-            dob DATE,
-            gender VARCHAR(10)
-        )
-    ''')
-
-    # Create login_history table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS login_history (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT,
-            name VARCHAR(255),
-            mobile VARCHAR(15),
-            email VARCHAR(255),
-            login_time DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
-    conn.commit()
-    cursor.close()
-    conn.close()
 
 # In-memory storage for OTP (temporary)
 otp_store = {}
@@ -360,7 +321,11 @@ def get_food_items():
             'price': item.price,
             'description': item.description,
             'image_url': item.image_url,
-            'rating': item.rating
+            'rating': item.rating,
+            'protein': item.protein,
+            'carbs': item.carbs,
+            'fats': item.fats,
+            'calories': item.calories
         } for item in items]
         return jsonify(food_items)
     except Exception as e:
@@ -511,7 +476,7 @@ def logout():
 # Routes for HTML pages
 @app.route('/')
 def home():
-    return render_template('cafeteria.html')
+    return render_template('login.html')
 
 @app.route('/login')
 def login_page():
@@ -533,6 +498,10 @@ def orders_page():
 def payment_page():
     return render_template('payment.html')
 
+@app.route('/payment.html')
+def payment_html_page():
+    return render_template('payment.html')
+
 @app.route('/profile')
 def profile_page():
     return render_template('profile.html')
@@ -547,8 +516,4 @@ def cafeteria():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create tables
-    try:
-        initialize_db()
-    except Exception as e:
-        print(f"Database connection failed: {e}. Running without database features.")
     app.run(debug=True, host='0.0.0.0', port=3000)
