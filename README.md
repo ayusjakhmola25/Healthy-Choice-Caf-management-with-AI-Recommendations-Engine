@@ -1,17 +1,17 @@
 <div align="center">
 
-# 🍽️ **Cafe Zone** - Smart Café Management System
+# 🍽️ ** Healthy Cafe Zone** - Smart Café Management System
 
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-blue.svg)](https://flask.palletsprojects.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.1.0-orange.svg)](https://www.mysql.com/)
 [![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/your-username/cafe-zone?style=social)](https://github.com/your-username/cafe-zone)
+[![Stars](https://img.shields.io/github/stars/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine?style=social)](https://github.com/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine)
 
 > **Revolutionize Your Café Experience** 🚀  
 > *AI-Powered Recommendations • Secure OTP Authentication • Seamless E-Commerce*
 
-[🌐 Live Demo](https://cafe-zone-demo.herokuapp.com) • [📖 Documentation](https://cafe-zone-docs.readthedocs.io) • [🐛 Report Bug](https://github.com/your-username/cafe-zone/issues)
+[🌐 Live Demo](https://cafe-zone-demo.herokuapp.com) • [📖 Documentation](https://cafe-zone-docs.readthedocs.io) • [🐛 Report Bug](https://github.com/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine.git)
 
 ---
 
@@ -37,7 +37,7 @@
 
 <div align="center">
 
-**Cafe Zone** is a cutting-edge, AI-driven café management platform that transforms traditional café operations into intelligent, customer-centric experiences. Built with modern web technologies, it combines secure authentication, personalized recommendations, and seamless e-commerce functionality to create the ultimate dining solution.
+**Healthy Cafe Zone** is a cutting-edge, AI-driven café management platform that transforms traditional café operations into intelligent, customer-centric experiences. Built with modern web technologies, it combines secure authentication, personalized recommendations, and seamless e-commerce functionality to create the ultimate dining solution.
 
 </div>
 
@@ -216,10 +216,10 @@ python app.py
 
 | Endpoint | Method | Description | Auth Required |
 |----------|--------|-------------|---------------|
-| `/register` | POST | User registration | ❌ |
-| `/login` | POST | Send login OTP | ❌ |
-| `/verify-login-otp` | POST | Verify OTP & login | ❌ |
-| `/food-items` | GET | Retrieve menu items | ❌ |
+| `/register` | POST | User registration | ✅ |
+| `/login` | POST | Send login OTP | ✅ |
+| `/verify-login-otp` | POST | Verify OTP & login | ✅ |
+| `/food-items` | GET | Retrieve menu items | ✅ |
 | `/add-to-cart` | POST | Add items to cart | ✅ |
 | `/save-order` | POST | Process order | ✅ |
 | `/generate-invoice` | POST | Create PDF invoice | ✅ |
@@ -300,15 +300,15 @@ cafe-zone/
 
 ### **Get in Touch**
 
-🐛 **Bug Reports**: [GitHub Issues](https://github.com/your-username/cafe-zone/issues)  
-💡 **Feature Requests**: [GitHub Discussions](https://github.com/your-username/cafe-zone/discussions)  
+🐛 **Bug Reports**: [GitHub Issues](https://github.com/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine/issues)  
+💡 **Feature Requests**: [GitHub Discussions](https://github.com/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine/discussions)  
 📧 **Email Support**: support@cafezone.com  
 📱 **Community**: [Discord Server](https://discord.gg/cafe-zone)
 
 ### **📊 Project Stats**
-![GitHub contributors](https://img.shields.io/github/contributors/your-username/cafe-zone)
-![GitHub last commit](https://img.shields.io/github/last-commit/your-username/cafe-zone)
-![GitHub issues](https://img.shields.io/github/issues/your-username/cafe-zone)
+![GitHub contributors](https://img.shields.io/github/contributors/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine)
+![GitHub last commit](https://img.shields.io/github/last-commit/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine)
+![GitHub issues](https://img.shields.io/github/issues/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine)
 
 </div>
 
@@ -324,6 +324,6 @@ cafe-zone/
 
 ---
 
-*© 2024 Cafe Zone. All rights reserved.*
+*© 2025 Cafe Zone. All rights reserved.*
 
 </div>
