@@ -50,9 +50,6 @@ class User(db.Model):
 class LoginHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String(255))
-    mobile = db.Column(db.String(15))
-    email = db.Column(db.String(255))
     login_time = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 # GuestOrder Model
@@ -316,7 +313,10 @@ def login_count():
         return jsonify({'error': 'Mobile number is required'}), 400
 
     try:
-        login_count_value = LoginHistory.query.filter_by(mobile=mobile).count()
+        user = User.query.filter_by(mobile=mobile).first()
+        if not user:
+            return jsonify({'loginCount': 0})
+        login_count_value = LoginHistory.query.filter_by(user_id=user.id).count()
         return jsonify({'loginCount': login_count_value})
     except Exception as e:
         print(f"Error fetching login count: {e}")

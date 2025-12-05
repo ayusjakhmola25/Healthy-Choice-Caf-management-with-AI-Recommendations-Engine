@@ -69,7 +69,16 @@ function loadProfile() {
     // Get user data from localStorage (now includes all fields)
     const user = JSON.parse(localStorage.getItem('user')) || {};
 
-    // Check if the form elements exist (only on profile.html)
+    // Populate table display elements
+    if (document.getElementById('profileNameDisplay')) {
+        document.getElementById('profileNameDisplay').textContent = user.name || '-';
+        document.getElementById('profileEmailDisplay').textContent = user.email || '-';
+        document.getElementById('profileMobileDisplay').textContent = user.mobile || '-';
+        document.getElementById('profileDOBDisplay').textContent = user.dob ? new Date(user.dob).toLocaleDateString() : '-';
+        document.getElementById('profileGenderDisplay').textContent = user.gender || '-';
+    }
+
+    // Populate form elements for editing
     if (document.getElementById('profileForm')) {
         document.getElementById('profileName').value = user.name || '';
         document.getElementById('profileMobile').value = user.mobile || '';
@@ -1489,58 +1498,25 @@ async function loadLoginHistory() {
     }
 }
 
-// Render profile insights (totals and averages from stored orders)
-async function renderProfileInsights() {
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-    const nameEl = document.getElementById('profileDisplayName');
-    const emailEl = document.getElementById('profileDisplayEmail');
-    const avatarEl = document.querySelector('.avatar');
-    if (nameEl) nameEl.textContent = user.name || 'Guest';
-    if (emailEl) emailEl.textContent = user.email || '';
-    if (avatarEl) avatarEl.textContent = (user.name || 'A').trim().charAt(0).toUpperCase();
+// Function to toggle between view and edit modes
+function toggleEditMode() {
+    const table = document.querySelector('.profile-table');
+    const editBtn = document.querySelector('.edit-profile-btn');
+    const form = document.getElementById('profileForm');
 
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const totalEl = document.getElementById('totalOrdersCount');
-    if (totalEl) totalEl.textContent = orders.length || 0;
-
-    const pref = localStorage.getItem('dietPreference');
-    const prefText = document.getElementById('prefText');
-    if (prefText) prefText.textContent = pref === 'diet' ? 'Diet' : (pref === 'non-diet' ? 'Non-Diet' : 'Balanced');
-
-    // Fetch login count from server
-    try {
-        const response = await fetch('http://127.0.0.1:3000/login-count', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ mobile: user.mobile })
-        });
-        if (response.ok) {
-            const data = await response.json();
-            const loginEl = document.getElementById('totalLogins');
-            if (loginEl) loginEl.textContent = data.loginCount || 0;
-        }
-    } catch (error) {
-        console.error('Error fetching login count:', error);
+    if (table.style.display === 'none') {
+        // Switch to view mode
+        table.style.display = 'table';
+        editBtn.textContent = 'Edit Profile';
+        form.style.display = 'none';
+        // Reload profile data to show updated info
+        loadProfile();
+    } else {
+        // Switch to edit mode
+        table.style.display = 'none';
+        editBtn.textContent = 'Cancel';
+        form.style.display = 'block';
     }
-
-    // Load login history
-    loadLoginHistory();
-
-    if (!orders.length) return;
-
-    const sums = orders.reduce((acc,o)=>{
-        acc.protein += o.metrics?.protein || 0;
-        acc.carbs += o.metrics?.carbs || 0;
-        acc.fats += o.metrics?.fats || 0;
-        acc.calories += o.metrics?.calories || 0;
-        return acc;
-    }, {protein:0,carbs:0,fats:0,calories:0});
-    const n = orders.length;
-    const set = (id, val, suffix='') => { const el=document.getElementById(id); if(el) el.textContent = val + suffix; };
-    set('avgProtein', (sums.protein/n).toFixed(1)+'g');
-    set('avgCarbs', (sums.carbs/n).toFixed(1)+'g');
-    set('avgFats', (sums.fats/n).toFixed(1)+'g');
-    set('avgCalories', Math.round(sums.calories/n));
 }
+
+
