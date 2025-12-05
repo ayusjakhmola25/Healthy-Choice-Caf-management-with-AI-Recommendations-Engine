@@ -124,7 +124,7 @@
 
 #### **Step 1: Clone & Navigate**
 ```bash
-git clone https://github.com/your-username/cafe-zone.git
+git clone https://github.com/ayusjakhmola25/Healthy-Choice-Caf-management-with-AI-Recommendations-Engine.git
 cd cafe-zone
 ```
 
@@ -320,7 +320,7 @@ cafe-zone/
 
 **⭐ Star this repo if you found it helpful!**
 
-[⬆️ Back to Top](#-cafe-zone---smart-café-management-system)
+[⬆️ Back to Top](#- Healthy cafe-zone---smart-café-management-system)
 
 ---
 
