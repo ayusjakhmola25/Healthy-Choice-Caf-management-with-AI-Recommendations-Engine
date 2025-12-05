@@ -365,6 +365,32 @@ function updateCartCount() {
     }
 }
 
+// Function to show add to cart confirmation popup
+function showAddToCartConfirmation(itemId, name, price, image_url, protein, carbs, fats, calories) {
+    const popup = document.getElementById('addToCartPopup');
+    const confirmBtn = document.getElementById('confirmAddBtn');
+    const cancelBtn = document.getElementById('cancelAddBtn');
+
+    if (popup && confirmBtn && cancelBtn) {
+        popup.style.display = 'flex';
+
+        // Remove previous event listeners
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        // Add event listeners
+        newConfirmBtn.addEventListener('click', () => {
+            popup.style.display = 'none';
+            addToCart(itemId, name, price, image_url, protein, carbs, fats, calories);
+        });
+        newCancelBtn.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    }
+}
+
 // Function to add item to cart
 function addToCart(itemId, name, price, image_url, protein, carbs, fats, calories) {
     const itemName = name || 'Item';
@@ -386,7 +412,39 @@ function addToCart(itemId, name, price, image_url, protein, carbs, fats, calorie
     }
     saveCart();
     updateCartCount();
-    alert(`${itemName} added to cart!`);
+    // Show success popup instead of alert
+    showAddedToCartPopup(itemName);
+}
+
+// Function to show added to cart success popup
+function showAddedToCartPopup(itemName) {
+    // Create a temporary popup for success message
+    const successPopup = document.createElement('div');
+    successPopup.style.position = 'fixed';
+    successPopup.style.inset = '0';
+    successPopup.style.background = 'rgba(0,0,0,0.5)';
+    successPopup.style.zIndex = '10000';
+    successPopup.style.display = 'flex';
+    successPopup.style.alignItems = 'center';
+    successPopup.style.justifyContent = 'center';
+
+    successPopup.innerHTML = `
+        <div style="background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.2);width:400px;max-width:90%;padding:26px;text-align:center;">
+            <div style="width:64px;height:64px;margin:0 auto 12px auto;border-radius:50%;background:#4CAF50;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;">✓</div>
+            <div style="font-weight:800;color:#333;font-size:20px;margin-bottom:6px;">Added to Cart!</div>
+            <div style="color:#666;margin-bottom:14px;">${itemName} has been added to your cart.</div>
+            <button style="background:#4CAF50;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;" onclick="this.parentElement.parentElement.remove()">OK</button>
+        </div>
+    `;
+
+    document.body.appendChild(successPopup);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (document.body.contains(successPopup)) {
+            document.body.removeChild(successPopup);
+        }
+    }, 3000);
 }
 
 // Function to increase quantity
@@ -543,7 +601,7 @@ async function loadFoodItems() {
                         <span class="quantity-display" id="quantity-${item.id}">1</span>
                         <button class="quantity-btn" onclick="increaseQuantity('${item.id}')">+</button>
                     </div>
-                    <button class="add-to-cart-btn" onclick="addToCart('${item.id}', '${item.name}', '${item.price}', '${item.image_url}', '${item.protein}', '${item.carbs}', '${item.fats}', '${item.calories}')">Add to Cart</button>
+                    <button class="add-to-cart-btn" onclick="showAddToCartConfirmation('${item.id}', '${item.name}', '${item.price}', '${item.image_url}', '${item.protein}', '${item.carbs}', '${item.fats}', '${item.calories}')">Add to Cart</button>
                 </div>
             `;
 
@@ -723,7 +781,7 @@ function loadPaymentPage() {
 
     if (cart.length === 0) {
         alert('Your cart is empty!');
-        window.location.href = 'cart.html';
+        window.location.href = '/cart';
         return;
     }
 
@@ -845,6 +903,9 @@ async function processCardPayment(event) {
         // Generate and download invoice
         await generateAndDownloadInvoice('Card Payment', customerName, customerMobile);
 
+        // Save order to localStorage for display
+        await saveOrder('Paid', 'Card Payment');
+
         // Simulate payment processing
         alert('Card payment successful! Your order has been placed. Invoice downloaded.');
 
@@ -852,8 +913,8 @@ async function processCardPayment(event) {
         localStorage.removeItem('cart');
         cart = [];
 
-        // Redirect to cafeteria
-        window.location.href = 'cafeteria.html';
+        // Redirect to orders
+        window.location.href = '/orders';
     } catch (error) {
         alert('Error processing payment: ' + error.message);
     }
@@ -907,14 +968,17 @@ async function processCodPayment() {
             // Generate and download invoice
             await generateAndDownloadInvoice('Cash on Delivery', customerName, customerMobile);
 
+            // Save order to localStorage for display
+            await saveOrder('Paid', 'Cash on Delivery');
+
             alert('Cash on Delivery order confirmed! Your order will be delivered in 30-45 minutes. Invoice downloaded.');
 
             // Clear cart
             localStorage.removeItem('cart');
             cart = [];
 
-            // Redirect to cafeteria
-            window.location.href = 'cafeteria.html';
+            // Redirect to orders
+            window.location.href = '/orders';
         } catch (error) {
             alert('Error processing COD order: ' + error.message);
         }
@@ -1037,7 +1101,8 @@ async function loadOrdersPage() {
             </div>
             <div class="order-footer">
                 <button class="invoice-btn" onclick="alert('Invoice already downloaded during checkout.')">View Invoice</button>
-                <button class="add-to-cart-btn" onclick="addOrderToCart(${index})" style="margin-left:10px;">Add to Cart</button>
+                <button class="delete-order-btn" onclick="deleteOrder(${index})" style="margin-left:10px; background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">Delete Order</button>
+                <button class="add-to-cart-btn" onclick="addOrderToCart(${index})" style="margin-left:10px; font-size:12px; padding:4px 8px;">Add to Cart</button>
             </div>
         </div>
     `).join('');
@@ -1064,6 +1129,19 @@ function addOrderToCart(orderIndex) {
         if (addedCount > 0) {
             alert(`${addedCount} item(s) from order ${order.id} added to cart!`);
         }
+    }
+}
+
+function deleteOrder(orderIndex) {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const order = orders[orderIndex];
+    if (!order) return;
+
+    if (confirm(`Are you sure you want to delete order ${order.id}? This action cannot be undone.`)) {
+        orders.splice(orderIndex, 1);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        alert(`Order ${order.id} has been deleted.`);
+        loadOrdersPage(); // Reload the orders page to reflect the changes
     }
 }
 
@@ -1251,7 +1329,7 @@ async function loadAIRecommendations() {
                         <strong>${it.name}</strong>
                         <span class="item-price" style="margin:0">₹${it.price}</span>
                     </div>
-                    <button class="add-to-cart-btn" style="margin-top:8px" onclick="addToCart('${it.id}','${it.name}','${it.price}','${it.image_url}','${it.protein}','${it.carbs}','${it.fats}','${it.calories}')">Add to Cart</button>
+                    <button class="add-to-cart-btn" style="margin-top:8px" onclick="showAddToCartConfirmation('${it.id}','${it.name}','${it.price}','${it.image_url}','${it.protein}','${it.carbs}','${it.fats}','${it.calories}')">Add to Cart</button>
                 </div>
             </div>
         `).join('');
@@ -1269,12 +1347,12 @@ async function loadAIRecommendations() {
 // Existing DOMContentLoaded logic
 document.addEventListener('DOMContentLoaded', () => {
     // Check the URL to only run loadProfile on the profile page
-    if (window.location.pathname.includes('profile.html')) {
+    if (window.location.pathname.includes('profile')) {
         // Check if user is logged in
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             alert('Please login first!');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
             return;
         }
         loadProfile();

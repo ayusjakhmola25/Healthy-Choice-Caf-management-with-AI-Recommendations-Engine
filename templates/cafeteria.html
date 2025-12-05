@@ -103,7 +103,7 @@
                     <p class="item-description">{{ item.description }}</p>
                     <p class="item-price">Get items @₹{{ item.price }} only</p>
 
-                    <button class="add-btn" onclick="addToCart('{{ item.id }}', '{{ item.name }}', '{{ item.price }}', '{{ item.image_url }}', '{{ item.protein }}', '{{ item.carbs }}', '{{ item.fats }}', '{{ item.calories }}')">Add +</button>
+                    <button class="add-btn" onclick="showAddToCartConfirmation('{{ item.id }}', '{{ item.name }}', '{{ item.price }}', '{{ item.image_url }}', '{{ item.protein }}', '{{ item.carbs }}', '{{ item.fats }}', '{{ item.calories }}')">Add +</button>
                 </div>
             </div>
             {% endfor %}
@@ -145,6 +145,18 @@
                 <button id="dietBtn" class="popup-btn diet-btn"><i class="fas fa-leaf"></i> Diet</button>
                 <button id="nonDietBtn" class="popup-btn non-diet-btn"><i class="fas fa-utensils"></i> Non-Diet</button>
                 <button id="cancelBtn" class="popup-btn cancel-btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Cart Confirmation Popup -->
+    <div id="addToCartPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2 style="color: #5DADE2;">Confirm this order</h2>
+            <p style="color: #34495E;">Confirm ho isse order se</p>
+            <div class="popup-buttons">
+                <button id="confirmAddBtn" class="popup-btn"><i class="fas fa-check"></i> Confirm</button>
+                <button id="cancelAddBtn" class="popup-btn cancel-btn"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
     </div>

@@ -64,6 +64,7 @@ class GuestOrder(db.Model):
     order_data = db.Column(db.Text, nullable=False)  # JSON string of cart items
     total_amount = db.Column(db.Float, nullable=False)
     payment_method = db.Column(db.String(50), nullable=False)
+    diet_preference = db.Column(db.String(20))  # 'diet', 'non-diet', or None
     order_date = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 
@@ -507,6 +508,7 @@ def save_order():
     order_data = data.get('order_data')  # JSON string of cart items
     total_amount = data.get('total_amount')
     payment_method = data.get('payment_method')
+    diet_preference = data.get('diet_preference')  # 'diet', 'non-diet', or None
 
     if not name or not mobile or not email or not order_data or not total_amount or not payment_method:
         return jsonify({'error': 'All fields are required'}), 400
@@ -519,12 +521,13 @@ def save_order():
             email=email,
             order_data=order_data,
             total_amount=total_amount,
-            payment_method=payment_method
+            payment_method=payment_method,
+            diet_preference=diet_preference
         )
         db.session.add(guest_order)
         db.session.commit()
 
-        print(f"Guest order saved: {name}, {mobile}, {email}, {total_amount}")
+        print(f"Guest order saved: {name}, {mobile}, {email}, {total_amount}, diet: {diet_preference}")
 
         return jsonify({'success': True, 'message': 'Order saved successfully', 'order_id': guest_order.id})
     except Exception as e:
