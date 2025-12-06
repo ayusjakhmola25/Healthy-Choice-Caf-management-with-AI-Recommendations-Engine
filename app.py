@@ -55,6 +55,7 @@ class LoginHistory(db.Model):
 # GuestOrder Model
 class GuestOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # For logged-in users
     name = db.Column(db.String(255), nullable=False)
     mobile = db.Column(db.String(15), nullable=False)
     email = db.Column(db.String(255), nullable=False)
@@ -518,6 +519,7 @@ def save_order():
     total_amount = data.get('total_amount')
     payment_method = data.get('payment_method')
     diet_preference = data.get('diet_preference')  # 'diet', 'non-diet', or None
+    user_id = data.get('user_id')  # Optional for logged-in users
 
     if not name or not mobile or not email or not order_data or not total_amount or not payment_method:
         return jsonify({'error': 'All fields are required'}), 400
@@ -525,6 +527,7 @@ def save_order():
     try:
         # Save to GuestOrder table
         guest_order = GuestOrder(
+            user_id=user_id,
             name=name,
             mobile=mobile,
             email=email,
@@ -536,7 +539,7 @@ def save_order():
         db.session.add(guest_order)
         db.session.commit()
 
-        print(f"Guest order saved: {name}, {mobile}, {email}, {total_amount}, diet: {diet_preference}")
+        print(f"Guest order saved: {name}, {mobile}, {email}, {total_amount}, diet: {diet_preference}, user_id: {user_id}")
 
         return jsonify({'success': True, 'message': 'Order saved successfully', 'order_id': guest_order.id})
     except Exception as e:

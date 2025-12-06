@@ -979,6 +979,7 @@ async function processCardPayment(event) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                user_id: user.id || null,
                 name: customerName,
                 mobile: customerMobile,
                 email: customerEmail,
@@ -1046,15 +1047,16 @@ async function processCodPayment() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    name: customerName,
-                    mobile: customerMobile,
-                    email: customerEmail,
-                    order_data: JSON.stringify(cart),
-                    total_amount: totalAmount,
-                    payment_method: 'Cash on Delivery',
-                    diet_preference: dietPreference
-                })
+            body: JSON.stringify({
+                user_id: user.id || null,
+                name: customerName,
+                mobile: customerMobile,
+                email: customerEmail,
+                order_data: JSON.stringify(cart),
+                total_amount: totalAmount,
+                payment_method: 'Cash on Delivery',
+                diet_preference: dietPreference
+            })
             });
 
             if (!saveResponse.ok) {
