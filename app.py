@@ -136,6 +136,11 @@ def register():
         return jsonify({'error': 'Name, mobile, and email are required'}), 400
 
     try:
+        # Check if guest order already exists
+        existing_guest = GuestOrder.query.filter((GuestOrder.mobile == mobile) | (GuestOrder.email == email)).first()
+        if existing_guest:
+            return jsonify({'error': 'You have already placed a guest order. Please login instead.'}), 400
+
         # Check if user already exists
         existing_user = User.query.filter((User.mobile == mobile) | (User.email == email)).first()
         if existing_user:
