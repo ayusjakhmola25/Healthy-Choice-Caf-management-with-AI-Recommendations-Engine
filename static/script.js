@@ -14,11 +14,12 @@ async function registerUser(e) {
       body: JSON.stringify({ name, mobile, email })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error('Registration failed');
+      throw new Error(data.error || 'Registration failed');
     }
 
-    const data = await response.json();
     alert('Registration successful! Please login.');
 
     // *** MODIFIED: Switch to Login form (slide back) ***
@@ -65,26 +66,106 @@ function logout() {
 // --- NEW PROFILE FUNCTIONS ---
 
 // Function to load profile data when the profile page opens
-function loadProfile() {
-    // Get user data from localStorage (now includes all fields)
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-
-    // Populate table display elements
-    if (document.getElementById('profileNameDisplay')) {
-        document.getElementById('profileNameDisplay').textContent = user.name || '-';
-        document.getElementById('profileEmailDisplay').textContent = user.email || '-';
-        document.getElementById('profileMobileDisplay').textContent = user.mobile || '-';
-        document.getElementById('profileDOBDisplay').textContent = user.dob ? new Date(user.dob).toLocaleDateString() : '-';
-        document.getElementById('profileGenderDisplay').textContent = user.gender || '-';
+async function loadProfile() {
+    const localUser = JSON.parse(localStorage.getItem('user')) || {};
+    if (!localUser.mobile) {
+        alert('User data not found. Please login again.');
+        window.location.href = '/login';
+        return;
     }
 
-    // Populate form elements for editing
-    if (document.getElementById('profileForm')) {
-        document.getElementById('profileName').value = user.name || '';
-        document.getElementById('profileMobile').value = user.mobile || '';
-        document.getElementById('profileEmail').value = user.email || '';
-        document.getElementById('profileDOB').value = user.dob || '';
-        document.getElementById('profileGender').value = user.gender || '';
+    try {
+        // Fetch latest user data from server
+        const response = await fetch('http://127.0.0.1:3000/check-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mobile: localUser.mobile })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+
+        const data = await response.json();
+        if (!data.exists) {
+            alert('User not found. Please login again.');
+            localStorage.clear();
+            window.location.href = '/login';
+            return;
+        }
+
+        const user = data.user;
+        // Update localStorage with latest data
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // Populate header display elements
+        if (document.getElementById('profileDisplayName')) {
+            document.getElementById('profileDisplayName').textContent = user.name || 'User';
+        }
+        if (document.getElementById('profileDisplayEmail')) {
+            document.getElementById('profileDisplayEmail').textContent = user.email || '';
+        }
+        // Update avatar with first letter of name
+        const avatar = document.querySelector('.avatar');
+        if (avatar) {
+            avatar.textContent = (user.name || 'U').charAt(0).toUpperCase();
+        }
+
+        // Populate table display elements
+        if (document.getElementById('profileNameDisplay')) {
+            document.getElementById('profileNameDisplay').textContent = user.name || '-';
+            document.getElementById('profileEmailDisplay').textContent = user.email || '-';
+            document.getElementById('profileMobileDisplay').textContent = user.mobile || '-';
+            document.getElementById('profileDOBDisplay').textContent = user.dob ? new Date(user.dob).toLocaleDateString() : '-';
+            document.getElementById('profileGenderDisplay').textContent = user.gender || '-';
+        }
+
+        // Populate form elements for editing
+        if (document.getElementById('profileForm')) {
+            document.getElementById('profileName').value = user.name || '';
+            document.getElementById('profileMobile').value = user.mobile || '';
+            document.getElementById('profileEmail').value = user.email || '';
+            document.getElementById('profileDOB').value = user.dob || '';
+            document.getElementById('profileGender').value = user.gender || '';
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Error loading profile data. Please try again.');
+        // Fallback to localStorage data
+        const user = localUser;
+
+        // Populate header display elements
+        if (document.getElementById('profileDisplayName')) {
+            document.getElementById('profileDisplayName').textContent = user.name || 'User';
+        }
+        if (document.getElementById('profileDisplayEmail')) {
+            document.getElementById('profileDisplayEmail').textContent = user.email || '';
+        }
+        // Update avatar with first letter of name
+        const avatar = document.querySelector('.avatar');
+        if (avatar) {
+            avatar.textContent = (user.name || 'U').charAt(0).toUpperCase();
+        }
+
+        // Populate table display elements
+        if (document.getElementById('profileNameDisplay')) {
+            document.getElementById('profileNameDisplay').textContent = user.name || '-';
+            document.getElementById('profileEmailDisplay').textContent = user.email || '-';
+            document.getElementById('profileMobileDisplay').textContent = user.mobile || '-';
+            document.getElementById('profileDOBDisplay').textContent = user.dob ? new Date(user.dob).toLocaleDateString() : '-';
+            document.getElementById('profileGenderDisplay').textContent = user.gender || '-';
+        }
+
+        // Populate form elements for editing
+        if (document.getElementById('profileForm')) {
+            document.getElementById('profileName').value = user.name || '';
+            document.getElementById('profileMobile').value = user.mobile || '';
+            document.getElementById('profileEmail').value = user.email || '';
+            document.getElementById('profileDOB').value = user.dob || '';
+            document.getElementById('profileGender').value = user.gender || '';
+        }
     }
 }
 
@@ -1495,6 +1576,81 @@ async function loadLoginHistory() {
     } catch (error) {
         console.error('Error fetching login history:', error);
         container.innerHTML = '<div style="text-align: center; color: #6b7b88; padding: 20px;">Error loading login history</div>';
+    }
+}
+
+// Function to render profile insights and statistics
+async function renderProfileInsights() {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    if (!user.mobile) return;
+
+    try {
+        // Fetch login count
+        const loginResponse = await fetch('http://127.0.0.1:3000/login-count', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile: user.mobile })
+        });
+        if (loginResponse.ok) {
+            const loginData = await loginResponse.json();
+            document.getElementById('totalLogins').textContent = loginData.loginCount || 0;
+        }
+
+        // Fetch login history
+        loadLoginHistory();
+
+        // Fetch user orders for statistics
+        const ordersResponse = await fetch('http://127.0.0.1:3000/get-guest-orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile: user.mobile, email: user.email })
+        });
+        if (ordersResponse.ok) {
+            const ordersData = await ordersResponse.json();
+            const orders = ordersData.orders || [];
+            document.getElementById('totalOrdersCount').textContent = orders.length;
+
+            // Calculate nutritional insights
+            if (orders.length > 0) {
+                let totalProtein = 0, totalCarbs = 0, totalFats = 0, totalCalories = 0;
+                let orderCount = 0;
+
+                orders.forEach(order => {
+                    try {
+                        const items = JSON.parse(order.order_data);
+                        items.forEach(item => {
+                            totalProtein += (item.protein || 0) * item.quantity;
+                            totalCarbs += (item.carbs || 0) * item.quantity;
+                            totalFats += (item.fats || 0) * item.quantity;
+                            totalCalories += (item.calories || 0) * item.quantity;
+                        });
+                        orderCount++;
+                    } catch (e) {
+                        console.error('Error parsing order data:', e);
+                    }
+                });
+
+                if (orderCount > 0) {
+                    document.getElementById('avgProtein').textContent = (totalProtein / orderCount).toFixed(1) + 'g';
+                    document.getElementById('avgCarbs').textContent = (totalCarbs / orderCount).toFixed(1) + 'g';
+                    document.getElementById('avgFats').textContent = (totalFats / orderCount).toFixed(1) + 'g';
+                    document.getElementById('avgCalories').textContent = Math.round(totalCalories / orderCount);
+                }
+            }
+
+            // Determine preference based on orders
+            const dietOrders = orders.filter(o => o.diet_preference === 'diet').length;
+            const nonDietOrders = orders.filter(o => o.diet_preference === 'non-diet').length;
+            if (dietOrders > nonDietOrders) {
+                document.getElementById('prefText').textContent = 'Diet';
+            } else if (nonDietOrders > dietOrders) {
+                document.getElementById('prefText').textContent = 'Non-Diet';
+            } else {
+                document.getElementById('prefText').textContent = 'Mixed';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading profile insights:', error);
     }
 }
 

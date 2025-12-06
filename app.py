@@ -290,8 +290,8 @@ def verify_login_otp():
         user = User.query.filter_by(mobile=stored_otp['mobile']).first()
         user_id = user.id
 
-        # Record login history with user details
-        login_history = LoginHistory(user_id=user_id, name=user.name, mobile=user.mobile, email=user.email)
+        # Record login history
+        login_history = LoginHistory(user_id=user_id)
         db.session.add(login_history)
         db.session.commit()
 
@@ -336,7 +336,11 @@ def get_login_history():
         return jsonify({'error': 'Mobile number is required'}), 400
 
     try:
-        login_history = LoginHistory.query.filter_by(mobile=mobile).order_by(LoginHistory.login_time.desc()).all()
+        user = User.query.filter_by(mobile=mobile).first()
+        if not user:
+            return jsonify({'loginHistory': []})
+
+        login_history = LoginHistory.query.filter_by(user_id=user.id).order_by(LoginHistory.login_time.desc()).all()
         history_data = [{
             'id': entry.id,
             'login_time': entry.login_time.isoformat()
@@ -540,6 +544,41 @@ def save_order():
         print(f"Error saving guest order: {e}")
         return jsonify({'error': 'Failed to save order'}), 500
 
+@app.route('/get-guest-orders', methods=['POST'])
+def get_guest_orders():
+    data = request.get_json()
+    mobile = data.get('mobile')
+    email = data.get('email')
+
+    if not mobile and not email:
+        return jsonify({'error': 'Mobile or email is required'}), 400
+
+    try:
+        query = GuestOrder.query
+        if mobile:
+            query = query.filter_by(mobile=mobile)
+        if email:
+            query = query.filter_by(email=email)
+
+        orders = query.order_by(GuestOrder.order_date.desc()).all()
+
+        orders_data = [{
+            'id': order.id,
+            'name': order.name,
+            'mobile': order.mobile,
+            'email': order.email,
+            'order_data': order.order_data,
+            'total_amount': order.total_amount,
+            'payment_method': order.payment_method,
+            'diet_preference': order.diet_preference,
+            'order_date': order.order_date.isoformat()
+        } for order in orders]
+
+        return jsonify({'success': True, 'orders': orders_data})
+    except Exception as e:
+        print(f"Error fetching guest orders: {e}")
+        return jsonify({'error': 'Failed to fetch guest orders'}), 500
+
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
@@ -574,9 +613,139 @@ def payment_page():
 def payment_html_page():
     return render_template('payment.html')
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile_page():
+    if request.method == 'POST':
+        data = request.get_json()
+        mobile = data.get('mobile')
+
+        if not mobile:
+            return jsonify({'error': 'Mobile number is required'}), 400
+
+        try:
+            user = User.query.filter_by(mobile=mobile).first()
+
+            if user:
+                user_data = {
+                    'id': user.id,
+                    'name': user.name,
+                    'mobile': user.mobile,
+                    'email': user.email,
+                    'dob': user.dob.isoformat() if user.dob else None,
+                    'gender': user.gender
+                }
+                return jsonify({'exists': True, 'user': user_data})
+            else:
+                return jsonify({'exists': False})
+        except Exception as e:
+            print(f"Error getting profile: {e}")
+            return jsonify({'error': 'Failed to get profile'}), 500
+
     return render_template('profile.html')
+
+@app.route('/profile-data', methods=['POST'])
+def get_profile_data():
+    data = request.get_json()
+    mobile = data.get('mobile')
+
+    if not mobile:
+        return jsonify({'error': 'Mobile number is required'}), 400
+
+    try:
+        user = User.query.filter_by(mobile=mobile).first()
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        user_data = {
+            'id': user.id,
+            'name': user.name,
+            'mobile': user.mobile,
+            'email': user.email,
+            'dob': user.dob.isoformat() if user.dob else None,
+            'gender': user.gender
+        }
+
+        # Get login count
+        login_count_value = LoginHistory.query.filter_by(user_id=user.id).count()
+
+        # Get login history
+        login_history = LoginHistory.query.filter_by(user_id=user.id).order_by(LoginHistory.login_time.desc()).all()
+        history_data = [{
+            'id': entry.id,
+            'login_time': entry.login_time.isoformat()
+        } for entry in login_history]
+
+        # Get orders
+        orders = GuestOrder.query.filter_by(mobile=mobile).order_by(GuestOrder.order_date.desc()).all()
+        orders_data = [{
+            'id': order.id,
+            'name': order.name,
+            'mobile': order.mobile,
+            'email': order.email,
+            'order_data': order.order_data,
+            'total_amount': order.total_amount,
+            'payment_method': order.payment_method,
+            'diet_preference': order.diet_preference,
+            'order_date': order.order_date.isoformat()
+        } for order in orders]
+
+        # Calculate nutritional insights
+        total_orders = len(orders)
+        if total_orders > 0:
+            total_protein = 0
+            total_carbs = 0
+            total_fats = 0
+            total_calories = 0
+
+            for order in orders:
+                try:
+                    items = eval(order.order_data)  # Assuming order_data is a string representation of list
+                    for item in items:
+                        total_protein += (item.get('protein', 0) * item.get('quantity', 1))
+                        total_carbs += (item.get('carbs', 0) * item.get('quantity', 1))
+                        total_fats += (item.get('fats', 0) * item.get('quantity', 1))
+                        total_calories += (item.get('calories', 0) * item.get('quantity', 1))
+                except:
+                    pass
+
+            avg_protein = total_protein / total_orders
+            avg_carbs = total_carbs / total_orders
+            avg_fats = total_fats / total_orders
+            avg_calories = total_calories / total_orders
+        else:
+            avg_protein = avg_carbs = avg_fats = avg_calories = 0
+
+        # Determine preference
+        diet_orders = sum(1 for o in orders if o.diet_preference == 'diet')
+        non_diet_orders = sum(1 for o in orders if o.diet_preference == 'non-diet')
+        if diet_orders > non_diet_orders:
+            preference = 'Diet'
+        elif non_diet_orders > diet_orders:
+            preference = 'Non-Diet'
+        else:
+            preference = 'Mixed'
+
+        return jsonify({
+            'user': user_data,
+            'loginCount': login_count_value,
+            'loginHistory': history_data,
+            'totalOrders': total_orders,
+            'avgProtein': round(avg_protein, 1),
+            'avgCarbs': round(avg_carbs, 1),
+            'avgFats': round(avg_fats, 1),
+            'avgCalories': round(avg_calories),
+            'preference': preference
+        })
+
+    except Exception as e:
+        print(f"Error getting profile data: {e}")
+        return jsonify({'error': 'Failed to get profile data'}), 500
+
+@app.route('/welcome', methods=['GET'])
+def welcome():
+    print(f"Request received: {request.method} {request.path}")
+    return jsonify({'message': 'Welcome to Cafe Zone!'})
 
 @app.route('/cafeteria')
 def cafeteria():

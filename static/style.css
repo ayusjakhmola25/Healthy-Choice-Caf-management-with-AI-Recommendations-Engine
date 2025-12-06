@@ -1651,6 +1651,16 @@ footer p {
 .avatar { width:40px; height:40px; border-radius:50%; background:#2d7a2d; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; }
 .profile-name { font-weight:800; color:#34495E; }
 .profile-email { color:#7b8b91; font-size:12px; }
+.profile-table { width:100%; border-collapse:collapse; margin-top:10px; }
+.profile-table tr { border-bottom:1px solid #eef3f7; }
+.profile-table td { padding:8px 0; color:#34495E; }
+.table-label { font-weight:700; color:#7b8b91; font-size:14px; }
+.table-value { font-weight:600; color:#34495E; font-size:14px; }
+.edit-profile-btn { background:#5DADE2; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:14px; }
+.edit-profile-btn:hover { background:#4682B4; }
+.cancel-button { background:#6c757d; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:8px; }
+.cancel-button:hover { background:#545b62; }
+.brand-text { display:flex; flex-direction:column; }
 .profile-side { display:flex; flex-direction:column; gap:16px; }
 .stats-card, .insights-card { background:#fff; border:1px solid #eef3f7; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); padding:14px; }
 .card-title { font-weight:800; color:#34495E; margin-bottom:8px; }
