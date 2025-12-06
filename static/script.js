@@ -957,11 +957,13 @@ async function processCardPayment(event) {
     let customerName = user.name;
     let customerMobile = user.mobile;
     let customerEmail = user.email;
+    let dietPreference = null;
 
     if (!customerName || !customerMobile || !customerEmail) {
         customerName = document.getElementById('guestName').value;
         customerMobile = document.getElementById('guestMobile').value;
         customerEmail = document.getElementById('guestEmail').value;
+        dietPreference = document.getElementById('dietPreference').value;
 
         if (!customerName || !customerMobile || !customerEmail) {
             alert('Please fill in guest details.');
@@ -982,7 +984,8 @@ async function processCardPayment(event) {
                 email: customerEmail,
                 order_data: JSON.stringify(cart),
                 total_amount: totalAmount,
-                payment_method: 'Card Payment'
+                payment_method: 'Card Payment',
+                diet_preference: dietPreference
             })
         });
 
@@ -1022,11 +1025,13 @@ async function processCodPayment() {
         let customerName = user.name;
         let customerMobile = user.mobile;
         let customerEmail = user.email;
+        let dietPreference = null;
 
         if (!customerName || !customerMobile || !customerEmail) {
             customerName = document.getElementById('guestName').value;
             customerMobile = document.getElementById('guestMobile').value;
             customerEmail = document.getElementById('guestEmail').value;
+            dietPreference = document.getElementById('dietPreference').value;
 
             if (!customerName || !customerMobile || !customerEmail) {
                 alert('Please fill in guest details.');
@@ -1047,7 +1052,8 @@ async function processCodPayment() {
                     email: customerEmail,
                     order_data: JSON.stringify(cart),
                     total_amount: totalAmount,
-                    payment_method: 'Cash on Delivery'
+                    payment_method: 'Cash on Delivery',
+                    diet_preference: dietPreference
                 })
             });
 

@@ -16,8 +16,8 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = 'your_secret_key_here'  # Change to a secure key in production
 
-# Configure SQLAlchemy - Using MySQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:ayush123@localhost:3306/cafe_users'
+# Configure SQLAlchemy - Using SQLite for simplicity
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafe_zone.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -586,7 +586,7 @@ def logout():
 
 # Routes for HTML pages
 @app.route('/')
-def home():
+def home():   
     return render_template('login.html')
 
 @app.route('/login')
